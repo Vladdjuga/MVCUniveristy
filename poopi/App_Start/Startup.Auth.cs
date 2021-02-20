@@ -58,11 +58,11 @@ namespace poopi
             //   appId: "",
             //   appSecret: "");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+            {
+                ClientId = "857679218387-339erqdcq1t373unof384h23n8tpvu07.apps.googleusercontent.com",
+                ClientSecret = "SrAStSA-iBn5GQPRcppPi6PX"
+            });
         }
     }
 }

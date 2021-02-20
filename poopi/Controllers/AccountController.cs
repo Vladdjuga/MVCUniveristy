@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -9,6 +11,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using poopi.Entities.Models;
+using poopi.Helpers;
 using poopi.Models;
 
 namespace poopi.Controllers
@@ -23,7 +26,7 @@ namespace poopi.Controllers
         {
         }
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
             UserManager = userManager;
             SignInManager = signInManager;
@@ -35,9 +38,9 @@ namespace poopi.Controllers
             {
                 return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
             }
-            private set 
-            { 
-                _signInManager = value; 
+            private set
+            {
+                _signInManager = value;
             }
         }
 
@@ -91,7 +94,7 @@ namespace poopi.Controllers
                             case "Student":
                                 return RedirectToAction("Index", "StudentPanel", new { area = "Student" });
                             case "User":
-                                return RedirectToAction("Index", "Home");   
+                                return RedirectToAction("Index", "Home");
                             default:
                                 return RedirectToAction("Index", "Home");
                         }
@@ -137,7 +140,7 @@ namespace poopi.Controllers
             // If a user enters incorrect codes for a specified amount of time then the user account 
             // will be locked out for a specified amount of time. 
             // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent:  model.RememberMe, rememberBrowser: model.RememberBrowser);
+            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -166,29 +169,38 @@ namespace poopi.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Register(RegisterViewModel model)
+        public async Task<ActionResult> Register(RegisterViewModel model, HttpPostedFileBase imagehttp)
         {
             if (ModelState.IsValid)
             {
+
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    Student student = new Student() { ApplicationUser = _context.Users.FirstOrDefault(x => x.Email == model.Email), FullName=model.FullName, Image=model.Image };
+                    string imagefile = Guid.NewGuid().ToString() + ".jpg";
+                    string image = Server.MapPath(ConstantsSec.ImagePath) + "\\" + imagefile;
+                    if (imagehttp != null)
+                    {
+                        using (Bitmap bitmap = new Bitmap(imagehttp.InputStream))
+                        {
+                            var saved = ImageWorker.CreateImage(bitmap, 400, 400);
+                            if (saved != null)
+                            {
+                                saved.Save(image, ImageFormat.Jpeg);
+                            }
+                        }
+                    }
+                    else imagefile = "default.jpg";
+                    Student student = new Student() { ApplicationUser = _context.Users.FirstOrDefault(x => x.Email == model.Email), FullName = model.FullName, Image = imagefile };
                     _context.Students.Add(student);
                     _context.SaveChanges();
 
-                    await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
-                    
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=320771
-                    // Send an email with this link
-                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     return RedirectToAction("Index", "Home");
+                    AddErrors(result);
                 }
-                AddErrors(result);
             }
 
             // If we got this far, something failed, redisplay form

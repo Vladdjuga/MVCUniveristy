@@ -180,6 +180,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\Constants.cs" />
+    <Compile Include="Helpers\ImageWorker.cs" />
     <Compile Include="Helpers\SeederDatabase.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -196,6 +198,11 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Image\adriana-patino.png" />
+    <Content Include="Image\btn_google_signin_dark_focus_web.png" />
+    <Content Include="Image\btn_google_signin_dark_normal_web.png" />
+    <Content Include="Image\btn_google_signin_dark_pressed_web.png" />
+    <Content Include="Image\logo-black.png" />
     <Content Include="Image\logo.png" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -207,6 +214,7 @@
     <Content Include="Areas\Student\Views\_ViewStart.cshtml" />
     <Content Include="Areas\Student\Views\Shared\_Layout.cshtml" />
     <Content Include="Areas\Student\Views\StudentPanel\Index.cshtml" />
+    <Content Include="fonts\fontleroybrown.regular.ttf" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />

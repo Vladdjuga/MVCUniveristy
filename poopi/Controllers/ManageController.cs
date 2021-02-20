@@ -18,6 +18,7 @@ namespace poopi.Controllers
 
         public ManageController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -50,6 +51,7 @@ namespace poopi.Controllers
             }
         }
 
+        ApplicationDbContext _context;
         //
         // GET: /Manage/Index
         public async Task<ActionResult> Index(ManageMessageId? message)
@@ -64,13 +66,16 @@ namespace poopi.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId();
+            var student = _context.Users.Find(userId).Student;
+
             var model = new IndexViewModel
             {
                 HasPassword = HasPassword(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
-                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
+                BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId),
+                Image = student != null ? student.Image : "default.jpg"
             };
             return View(model);
         }
